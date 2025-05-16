@@ -3,17 +3,19 @@ version: '3.9'
 services:
   web:
     build: .
-    command: gunicorn app.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn streamflix.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     env_file:
       - .env
-    depends_on:
-      - db
+    # depends_on:
+    #   - db
     ports:
       - "8000:8000"
+    networks:
+      - mynetwork
 
   nginx:
     image: nginx:alpine
@@ -25,8 +27,13 @@ services:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - web
+    networks:
+      - mynetwork
 
 volumes:
   postgres_data:
   static_volume:
   media_volume:
+
+networks:
+  mynetwork:
